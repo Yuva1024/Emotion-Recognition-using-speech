@@ -1,0 +1,87 @@
+# Virtual Environment
+emotion_env/
+venv/
+env/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Model files (large files)
+model/*.h5
+model/*.pkl
+model/best_model.h5
+
+# Dataset files (large files)
+ravdess_speech/*.wav
+ravdess_speech/**/*.wav
+
+# Training outputs
+*.png
+*.jpg
+*.jpeg
+confusion_matrix.png
+training_history.png
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Environment variables
+.env
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Streamlit
+.streamlit/
+
+# Audio files (except .gitkeep)
+*.wav
+*.mp3
+*.flac
+*.m4a
+*.aac 
