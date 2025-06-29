@@ -6,7 +6,11 @@ This guide will help you deploy your Emotion Recognition from Speech application
 
 1. **Trained Model**: Make sure you have trained models in the `model/` directory
 2. **Git Repository**: Your project should be in a Git repository
-3. **Dependencies**: All required packages are listed in `requirements_deploy.txt`
+3. **Dependencies**: All required packages are listed in `requirements_streamlit.txt`
+
+## ⚠️ Important: TensorFlow Compatibility Fix
+
+**If you're getting TensorFlow installation errors on Streamlit Cloud**, use `requirements_streamlit.txt` instead of `requirements_deploy.txt`. This file uses `tensorflow-cpu` which is more compatible with cloud platforms.
 
 ## 🎯 Deployment Options
 
@@ -19,7 +23,7 @@ This guide will help you deploy your Emotion Recognition from Speech application
 1. **Push to GitHub**:
    ```bash
    git add .
-   git commit -m "Add deployment files"
+   git commit -m "Add deployment files with TensorFlow compatibility fix"
    git push origin main
    ```
 
@@ -29,11 +33,19 @@ This guide will help you deploy your Emotion Recognition from Speech application
    - Click "New app"
    - Select your repository
    - Set the main file path to: `streamlit_app.py`
+   - **Important**: Use `requirements_streamlit.txt` for dependencies
    - Click "Deploy"
 
 3. **Configuration**:
-   - The app will automatically use `requirements_deploy.txt`
+   - The app will automatically use `requirements_streamlit.txt`
    - Your model files will be included in the deployment
+
+#### Troubleshooting Streamlit Cloud Issues:
+
+If you see TensorFlow installation errors:
+1. Make sure you're using `requirements_streamlit.txt` (not `requirements_deploy.txt`)
+2. The file uses `tensorflow-cpu` which is more compatible
+3. Python version is set to 3.11.0 in `runtime.txt`
 
 ### Option 2: Heroku
 
@@ -101,7 +113,7 @@ This guide will help you deploy your Emotion Recognition from Speech application
 2. **Create Web Service**:
    - Click "New +" → "Web Service"
    - Connect your GitHub repository
-   - Set build command: `pip install -r requirements_deploy.txt`
+   - Set build command: `pip install -r requirements_streamlit.txt`
    - Set start command: `streamlit run streamlit_app.py --server.port=$PORT --server.address=0.0.0.0`
 
 3. **Deploy**:
@@ -116,7 +128,7 @@ For testing or internal use, you can deploy locally.
 
 1. **Install Dependencies**:
    ```bash
-   pip install -r requirements_deploy.txt
+   pip install -r requirements_streamlit.txt
    ```
 
 2. **Run the App**:
@@ -134,42 +146,60 @@ For testing or internal use, you can deploy locally.
 - Configures the app appearance and behavior
 - Sets theme colors and server settings
 
-### Requirements (`requirements_deploy.txt`)
-- Lists all Python dependencies with pinned versions
-- Ensures consistent deployment across platforms
+### Requirements Files
+- `requirements_streamlit.txt`: For Streamlit Cloud (uses tensorflow-cpu)
+- `requirements_deploy.txt`: For other platforms (uses tensorflow)
 
 ### Procfile (for Heroku)
 - Tells Heroku how to run the application
 - Sets the correct port and address
 
 ### Runtime (`runtime.txt`)
-- Specifies Python version for deployment platforms
+- Specifies Python version (3.11.0) for deployment platforms
+
+## 🧪 Testing Before Deployment
+
+Run the test script to verify everything works:
+
+```bash
+python test_deployment.py
+```
+
+This will check:
+- All imports work correctly
+- Model files can be loaded
+- Audio utilities are functional
 
 ## 🚨 Troubleshooting
 
 ### Common Issues:
 
-1. **Model Not Found**:
+1. **TensorFlow Installation Error**:
+   - **Solution**: Use `requirements_streamlit.txt` instead of `requirements_deploy.txt`
+   - This uses `tensorflow-cpu` which is more compatible with cloud platforms
+
+2. **Model Not Found**:
    - Ensure model files are in the `model/` directory
    - Check file permissions
    - Verify model file names match the code
 
-2. **Dependencies Issues**:
-   - Update `requirements_deploy.txt` with correct versions
+3. **Dependencies Issues**:
+   - Update requirements files with correct versions
    - Some platforms may need additional system dependencies
 
-3. **Memory Issues**:
+4. **Memory Issues**:
    - Large models may exceed free tier limits
    - Consider using smaller models for deployment
    - Upgrade to paid tiers if needed
 
-4. **Audio Processing Errors**:
+5. **Audio Processing Errors**:
    - Ensure all audio libraries are properly installed
    - Check audio file format support
 
 ### Platform-Specific Issues:
 
 #### Streamlit Cloud:
+- **TensorFlow Issue**: Use `requirements_streamlit.txt` with `tensorflow-cpu`
 - File size limits: 200MB per file
 - Memory limits: 1GB RAM
 - Build time limits: 10 minutes
