@@ -12,6 +12,39 @@ import tensorflow as tf
 # Import our custom audio processor
 from utils.audio_utils import AudioProcessor
 
+# Custom InputLayer to handle compatibility issues
+class CustomInputLayer(tf.keras.layers.Layer):
+    def __init__(self, input_shape=None, batch_shape=None, dtype=None, sparse=False, ragged=False, name=None, **kwargs):
+        # Remove batch_shape from kwargs to avoid the error
+        if 'batch_shape' in kwargs:
+            del kwargs['batch_shape']
+        super().__init__(name=name, **kwargs)
+        self._input_shape = input_shape
+        self._batch_shape = batch_shape
+        self._dtype = dtype
+        self._sparse = sparse
+        self._ragged = ragged
+    
+    @property
+    def input_shape(self):
+        return self._input_shape
+    
+    @property
+    def batch_shape(self):
+        return self._batch_shape
+    
+    @property
+    def dtype(self):
+        return self._dtype
+    
+    @property
+    def sparse(self):
+        return self._sparse
+    
+    @property
+    def ragged(self):
+        return self._ragged
+
 # Page configuration
 st.set_page_config(
     page_title="Emotion Recognition from Speech",
@@ -115,8 +148,28 @@ def load_model():
             st.error("❌ No model file found! Please train the model first.")
             return None, None, None
             
-        # Load model
-        model = tf.keras.models.load_model(model_path)
+        # Load model with compatibility handling
+        try:
+            # First try loading without custom objects (works on local machine)
+            model = tf.keras.models.load_model(model_path, compile=False)
+        except Exception as e:
+            # If that fails, try with custom objects to handle deprecated parameters
+            try:
+                custom_objects = {
+                    'InputLayer': CustomInputLayer
+                }
+                model = tf.keras.models.load_model(model_path, custom_objects=custom_objects, compile=False)
+            except Exception as e2:
+                # If that fails, try with skip_serialization_validation
+                try:
+                    model = tf.keras.models.load_model(model_path, compile=False, skip_serialization_validation=True)
+                except Exception as e3:
+                    # Last resort: try with experimental options
+                    try:
+                        model = tf.keras.models.load_model(model_path, compile=False, options=tf.saved_model.LoadOptions(experimental_io_device='/job:localhost'))
+                    except Exception as e4:
+                        st.error(f"❌ Failed to load model: {str(e4)}")
+                        return None, None, None
         
         # Load label encoder
         with open(encoder_path, 'rb') as f:
