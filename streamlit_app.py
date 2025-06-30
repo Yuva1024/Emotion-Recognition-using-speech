@@ -7,7 +7,7 @@ import os
 import tempfile
 import pickle
 import warnings
-warnings.filterwarnings('ignore')
+import tensorflow as tf
 
 # Import our custom audio processor
 from utils.audio_utils import AudioProcessor
@@ -97,35 +97,23 @@ def load_model():
     Load the trained emotion recognition model and label encoder.
     """
     try:
-        # Try to load the best model first
-        model_paths = [
-            'model/best_gpu_model.h5',
-            'model/best_improved_model.h5', 
-            'model/best_simple_model.h5',
-            'model/emotion_model_simple.h5',
-            'model/emotion_model.h5'
-        ]
+        # Use the best GPU model by default
+        model_path = 'model/best_gpu_model.h5'
+        encoder_path = 'model/emotion_model_encoder.pkl'
         
-        model_path = None
-        for path in model_paths:
-            if os.path.exists(path):
-                model_path = path
-                break
-                
-        if model_path is None:
+        if not os.path.exists(model_path):
+            # Fallback to original model
+            model_path = 'model/emotion_model.h5'
+            encoder_path = 'model/emotion_model_encoder.pkl'
+            
+        if not os.path.exists(model_path):
             st.error("❌ No model file found! Please train the model first.")
             return None, None, None
             
         # Load model
-        from tensorflow import keras
-        model = keras.models.load_model(model_path)
+        model = tf.keras.models.load_model(model_path)
         
-        # Load corresponding encoder
-        encoder_path = model_path.replace('.h5', '_encoder.pkl')
-        if not os.path.exists(encoder_path):
-            # Try simple encoder
-            encoder_path = 'model/emotion_model_simple_encoder.pkl'
-            
+        # Load label encoder
         with open(encoder_path, 'rb') as f:
             label_encoder = pickle.load(f)
         

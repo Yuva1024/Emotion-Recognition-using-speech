@@ -14,7 +14,7 @@ import os
 import tempfile
 from PIL import Image
 import warnings
-warnings.filterwarnings('ignore')
+import tensorflow as tf
 
 # Import our custom audio processor
 from utils.audio_utils import AudioProcessor
@@ -33,9 +33,9 @@ def load_model():
     Load the trained emotion recognition model and label encoder.
     """
     try:
-        # Try to load the simple model first
-        model_path = 'model/emotion_model_simple.h5'
-        encoder_path = 'model/emotion_model_simple_encoder.pkl'
+        # Use the best GPU model by default
+        model_path = 'model/best_gpu_model.h5'
+        encoder_path = 'model/emotion_model_encoder.pkl'
         
         if not os.path.exists(model_path):
             # Fallback to original model
@@ -47,8 +47,7 @@ def load_model():
             return None, None, None
             
         # Load model
-        from tensorflow import keras
-        model = keras.models.load_model(model_path)
+        model = tf.keras.models.load_model(model_path)
         
         # Load label encoder
         with open(encoder_path, 'rb') as f:
