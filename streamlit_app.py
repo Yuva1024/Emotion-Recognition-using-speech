@@ -97,10 +97,15 @@ def load_model():
     Load the trained emotion recognition model and label encoder.
     """
     try:
-        # Use the best GPU model by default
-        model_path = 'model/best_gpu_model.h5'
-        encoder_path = 'model/emotion_model_encoder.pkl'
+        # Use the best simple model by default (more compatible)
+        model_path = 'model/best_simple_model.h5'
+        encoder_path = 'model/emotion_model_simple_encoder.pkl'
         
+        if not os.path.exists(model_path):
+            # Fallback to GPU model
+            model_path = 'model/best_gpu_model.h5'
+            encoder_path = 'model/emotion_model_encoder.pkl'
+            
         if not os.path.exists(model_path):
             # Fallback to original model
             model_path = 'model/emotion_model.h5'
